@@ -1,0 +1,8 @@
+"""
+Python API não oficial para Dicio.com.br
+
+@autor Felipe Pontes
+@email felipemfpontes@gmail.com
+"""
+from dicio.dicio import Dicio, Word
+from dicio.utils import Utils

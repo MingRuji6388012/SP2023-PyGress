@@ -1,0 +1,2 @@
+Number of successfully recorded projects: 19
+Number of unsuccessfully recorded projects: 0

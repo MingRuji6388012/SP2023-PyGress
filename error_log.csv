@@ -1,0 +1,182 @@
+URL,Error,NotExisted,DataWritten
+https://github.com/ndlib/hesburgh_utilities,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/ndlib/hesburgh_utilities C:\Users\rujip\AppData\Local\Temp\tmpc8z2he87\hesburgh_utilities
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpc8z2he87\hesburgh_utilities'...
+remote: Repository not found.
+fatal: repository 'https://github.com/ndlib/hesburgh_utilities/' not found
+'",Yes,No
+https://github.com/fujiisoup/lstpy,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/fujiisoup/lstpy C:\Users\rujip\AppData\Local\Temp\tmp71dxfmq2\lstpy
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp71dxfmq2\lstpy'...
+POST git-upload-pack (185 bytes)
+POST git-upload-pack (477 bytes)
+Downloading test_public/data/Biedermann036.lst (11 MB)
+Error downloading object: test_public/data/Biedermann036.lst (3cee849): Smudge error: Error downloading test_public/data/Biedermann036.lst (3cee8499fb3ff59ef60902c9aac2dd0982e33512e48cbcee60d190a5907ae287): batch response: This repository is over its data quota. Account responsible for LFS bandwidth should purchase more data packs to restore access.
+
+Errors logged to 'C:\Users\rujip\AppData\Local\Temp\tmp71dxfmq2\lstpy\.git\lfs\logs\20240301T060230.188778.log'.
+Use `git lfs logs last` to view the log.
+error: external filter 'git-lfs filter-process' failed
+fatal: test_public/data/Biedermann036.lst: smudge filter lfs failed
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+'",Yes,No
+https://github.com/scoremedia/marol,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/scoremedia/marol C:\Users\rujip\AppData\Local\Temp\tmp0vgzwniq\marol
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp0vgzwniq\marol'...
+remote: Repository not found.
+fatal: repository 'https://github.com/scoremedia/marol/' not found
+'",Yes,No
+https://github.com/evolbioinfo/pastml,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/evolbioinfo/pastml C:\Users\rujip\AppData\Local\Temp\tmp39h06evm\pastml
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp39h06evm\pastml'...
+POST git-upload-pack (185 bytes)
+POST git-upload-pack (gzip 2477 to 1226 bytes)
+error: invalid path 'examples/HIV1C/data/maps/DRM_RT:D67N/pastml_phyml_tree.html'
+fatal: unable to checkout working tree
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+'",Yes,No
+https://github.com/oddjobz/pymamba,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/oddjobz/pymamba C:\Users\rujip\AppData\Local\Temp\tmpf_1qzyfv\pymamba
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpf_1qzyfv\pymamba'...
+remote: Repository not found.
+fatal: repository 'https://github.com/oddjobz/pymamba/' not found
+'",Yes,No
+https://github.com/Aplopio/plasticparser,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/Aplopio/plasticparser C:\Users\rujip\AppData\Local\Temp\tmp18p7xj2b\plasticparser
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp18p7xj2b\plasticparser'...
+remote: Repository not found.
+fatal: repository 'https://github.com/Aplopio/plasticparser/' not found
+'",Yes,No
+https://github.com/Drachenfels/url2vapi,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/Drachenfels/url2vapi C:\Users\rujip\AppData\Local\Temp\tmpss06h_dl\url2vapi
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpss06h_dl\url2vapi'...
+remote: Repository not found.
+fatal: repository 'https://github.com/Drachenfels/url2vapi/' not found
+'",Yes,No
+https://github.com/Marcello-Sega/pytim,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/Marcello-Sega/pytim C:\Users\rujip\AppData\Local\Temp\tmp9am4koep\pytim
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp9am4koep\pytim'...
+POST git-upload-pack (185 bytes)
+POST git-upload-pack (gzip 3927 to 1981 bytes)
+error: invalid path '.travis.yml.'
+fatal: unable to checkout working tree
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+'",Yes,No
+https://github.com/MathStuff/Matrices,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/MathStuff/Matrices C:\Users\rujip\AppData\Local\Temp\tmp1k7pyc8x\Matrices
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp1k7pyc8x\Matrices'...
+remote: Repository not found.
+fatal: repository 'https://github.com/MathStuff/Matrices/' not found
+'",Yes,No
+https://github.com/acristoffers/ahio,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/acristoffers/ahio C:\Users\rujip\AppData\Local\Temp\tmpwnkoq61u\ahio
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpwnkoq61u\ahio'...
+POST git-upload-pack (185 bytes)
+POST git-upload-pack (277 bytes)
+error: invalid path 'Generic TCP I:O Protocol.md'
+fatal: unable to checkout working tree
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+'",Yes,No
+https://github.com/cogniteev/backache,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/cogniteev/backache C:\Users\rujip\AppData\Local\Temp\tmpaegmt88f\backache
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpaegmt88f\backache'...
+remote: Repository not found.
+fatal: repository 'https://github.com/cogniteev/backache/' not found
+'",Yes,No
+https://github.com/cogniteev/yamlious,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/cogniteev/yamlious C:\Users\rujip\AppData\Local\Temp\tmprkbdx747\yamlious
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmprkbdx747\yamlious'...
+remote: Repository not found.
+fatal: repository 'https://github.com/cogniteev/yamlious/' not found
+'",Yes,No
+https://github.com/davincif/simplestRPC,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/davincif/simplestRPC C:\Users\rujip\AppData\Local\Temp\tmpbqueg9a8\simplestRPC
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpbqueg9a8\simplestRPC'...
+POST git-upload-pack (185 bytes)
+POST git-upload-pack (gzip 1027 to 557 bytes)
+error: invalid path 'simplestRPC/auxiliar/aux.py'
+fatal: unable to checkout working tree
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+'",Yes,No
+https://github.com/iljau/reloadex,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/iljau/reloadex C:\Users\rujip\AppData\Local\Temp\tmp7g_j5zqt\reloadex
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp7g_j5zqt\reloadex'...
+remote: Repository not found.
+fatal: repository 'https://github.com/iljau/reloadex/' not found
+'",Yes,No
+https://github.com/nuric/pedlar,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/nuric/pedlar C:\Users\rujip\AppData\Local\Temp\tmp_kuu5hef\pedlar
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp_kuu5hef\pedlar'...
+remote: Repository unavailable due to DMCA takedown.
+remote: See the takedown notice for more details:
+remote:   https://github.com/github/dmca/blob/master/2023/11/2023-11-07-metatrader.md.
+fatal: unable to access 'https://github.com/nuric/pedlar/': The requested URL returned error: 403
+'",Yes,No
+https://github.com/stasfilin/fastread,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/stasfilin/fastread C:\Users\rujip\AppData\Local\Temp\tmp6hzi44sj\fastread
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmp6hzi44sj\fastread'...
+remote: Repository not found.
+fatal: repository 'https://github.com/stasfilin/fastread/' not found
+'",Yes,No
+https://github.com/tanjm/minipay,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/tanjm/minipay C:\Users\rujip\AppData\Local\Temp\tmpvyw0io_v\minipay
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpvyw0io_v\minipay'...
+remote: Repository not found.
+fatal: repository 'https://github.com/tanjm/minipay/' not found
+'",Yes,No
+https://github.com/tf-encrypted/tf-encrypted,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/tf-encrypted/tf-encrypted C:\Users\rujip\AppData\Local\Temp\tmpqt_0at_p\tf-encrypted
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpqt_0at_p\tf-encrypted'...
+POST git-upload-pack (185 bytes)
+POST git-upload-pack (gzip 4127 to 2083 bytes)
+error: invalid path 'operations/aux/aux_kernels.cc'
+fatal: unable to checkout working tree
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+'",Yes,No
+https://github.com/ttm/percolation,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/ttm/percolation C:\Users\rujip\AppData\Local\Temp\tmpj0yhw2zv\percolation
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpj0yhw2zv\percolation'...
+POST git-upload-pack (185 bytes)
+POST git-upload-pack (227 bytes)
+error: invalid path 'percolation/measures/text/aux.py'
+fatal: unable to checkout working tree
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+'",Yes,No
+https://github.com/alexhagen/pyg,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/alexhagen/pyg C:\Users\rujip\AppData\Local\Temp\tmpfuqtn9m6\pyg
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpfuqtn9m6\pyg'...
+POST git-upload-pack (185 bytes)
+POST git-upload-pack (277 bytes)
+error: invalid path 'docs/_templates/*'
+fatal: unable to checkout working tree
+warning: Clone succeeded, but checkout failed.
+You can inspect what was checked out with 'git status'
+and retry with 'git restore --source=HEAD :/'
+
+'",Yes,No
+https://github.com/marcinn/restosaur,"Cmd('git') failed due to: exit code(128)
+  cmdline: git clone -v -- https://github.com/marcinn/restosaur C:\Users\rujip\AppData\Local\Temp\tmpjfeok_zd\restosaur
+  stderr: 'Cloning into 'C:\Users\rujip\AppData\Local\Temp\tmpjfeok_zd\restosaur'...
+remote: Repository not found.
+fatal: repository 'https://github.com/marcinn/restosaur/' not found
+'",Yes,No

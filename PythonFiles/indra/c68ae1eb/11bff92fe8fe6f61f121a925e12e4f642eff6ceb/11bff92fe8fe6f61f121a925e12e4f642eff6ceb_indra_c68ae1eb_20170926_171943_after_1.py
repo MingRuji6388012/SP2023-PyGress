@@ -1,0 +1,329 @@
+from __future__ import absolute_import, print_function, unicode_literals
+from builtins import dict, str
+import logging
+from os.path import join, dirname
+from collections import namedtuple, Counter, defaultdict
+
+from indra.statements import *
+from indra.util import read_unicode_csv
+from indra.databases import hgnc_client, uniprot_client
+
+logger = logging.getLogger('signor')
+
+
+_signor_fields = [
+    'ENTITYA',
+    'TYPEA',
+    'IDA',
+    'DATABASEA',
+    'ENTITYB',
+    'TYPEB',
+    'IDB',
+    'DATABASEB',
+    'EFFECT',
+    'MECHANISM',
+    'RESIDUE',
+    'SEQUENCE',
+    'TAX_ID',
+    'CELL_DATA',
+    'TISSUE_DATA',
+    'MODULATOR_COMPLEX',
+    'TARGET_COMPLEX',
+    'MODIFICATIONA',
+    'MODASEQ',
+    'MODIFICATIONB',
+    'MODBSEQ',
+    'PMID',
+    'DIRECT',
+    'NOTES',
+    'ANNOTATOR',
+    'SENTENCE',
+    'SIGNOR_ID',
+]
+
+
+SignorRow = namedtuple('SignorRow', _signor_fields)
+
+
+_type_db_map = {
+    ('antibody', None): None,
+    ('protein', 'UNIPROT'): 'UP',
+    ('complex', 'SIGNOR'): 'SIGNOR',
+    ('proteinfamily', 'SIGNOR'): 'SIGNOR',
+    ('smallmolecule', 'PUBCHEM'): 'PUBCHEM',
+    ('pathway', None): None,
+    ('phenotype', 'SIGNOR'): 'SIGNOR',
+    ('stimulus', 'SIGNOR'): 'SIGNOR',
+    ('chemical', 'PUBCHEM'): 'PUBCHEM',
+}
+
+
+_mechanism_map = {
+    'catalytic activity': None, # Conversion
+    'oxidoreductase activity': None,
+    'transcriptional activation': None, # IncreaseAmount by tscript
+    'transcriptional repression': None, # DecreaseAmount by tscript
+    'Farnesylation': Farnesylation,
+    'gtpase-activating protein': Gap,
+    'deacetylation': Deacetylation,
+    'demethylation': Demethylation,
+    'dephosphorylation': Dephosphorylation,
+    'destabilization': DecreaseAmount,
+    'guanine nucleotide exchange factor': Gef,
+    'acetylation': Acetylation,
+    'binding': Complex,
+    'cleavage': None, # Important!
+    'desumoylation': Desumoylation,
+    'deubiquitination': Deubiquitination,
+    'glycosylation': Glycosylation,
+    'hydroxylation': Hydroxylation,
+    'neddylation': None, # Neddylation,
+    'chemical activation': Activation,
+    'chemical inhibition': Inhibition,
+    'trimethylation': Methylation,
+    'ubiquitination': Ubiquitination,
+    'post transcriptional regulation': None,
+    'relocalization': None, # Translocation,
+    'small molecule catalysis': None,
+    's-nitrosylation': None,
+    'transcriptional regulation': None, # Need to know if up or down
+    'translation regulation': None,
+    'tyrosination': None,
+    'lipidation': None,
+    'oxidation': None,
+    'methylation': Methylation,
+    'palmitoylation': Palmitoylation,
+    'phosphorylation': Phosphorylation,
+    'stabilization': IncreaseAmount,
+    'sumoylation': Sumoylation
+}
+
+
+_effect_map = {
+    'down-regulates': Inhibition, # FIXME
+    'down-regulates activity': Inhibition,
+    'down-regulates quantity': DecreaseAmount,
+    'down-regulates quantity by destabilization': DecreaseAmount,
+    'down-regulates quantity by repression': DecreaseAmount,
+    'form complex': Complex,
+    'unknown': None,
+    'up-regulates': Activation, # FIXME
+    'up-regulates activity': Activation,
+    'up-regulates quantity': IncreaseAmount,
+    'up-regulates quantity by expression': IncreaseAmount,
+    'up-regulates quantity by stabilization': IncreaseAmount
+}
+
+
+signor_default_path = join(dirname(__file__), '..', '..', 'data',
+                          'all_data_23_09_17.csv')
+
+
+class SignorProcessor(object):
+    """Processor for Signor dataset, available at http://signor.uniroma2.it.
+
+    See publication:
+
+    Perfetto et al., "SIGNOR: a database of causal relationships between
+    biological entities," Nucleic Acids Research, Volume 44, Issue D1, 4
+    January 2016, Pages D548-D554. https://doi.org/10.1093/nar/gkv1048
+
+    Parameters
+    ----------
+    signor_csv : str
+        Path to SIGNOR CSV file.
+    delimiter : str
+        Field delimiter for CSV file. Defaults to semicolon ';'.
+
+    Attributes
+    ----------
+    skipped_rows : list of SignorRow namedtuples
+        List of rows where no mechanism statements were generated.
+    skip_ctr : collections.Counter
+        Counter listing the frequency of different MECHANISM types in the
+        list of skipped rows.
+    """
+    def __init__(self, signor_csv, delimiter=';'):
+        # Get generator over the CSV file
+        data_iter = read_unicode_csv(signor_csv, delimiter=';')
+        # Skip the header row
+        next(data_iter)
+        # Process into a list of SignorRow namedtuples
+        # Strip off any funky \xa0 whitespace characters
+        self._data = [SignorRow(*[f.strip() for f in r]) for r in data_iter]
+        # Process into statements
+        self.statements = []
+        self.skipped_rows = []
+        for row in self._data:
+            row_stmts = self._process_row(row)
+            self.statements.extend(row_stmts)
+        # Skipped statements by type
+        skip_ctr = Counter([row.MECHANISM for row in self.skipped_rows])
+        self.skip_ctr = sorted([(k, v) for k, v in skip_ctr.items()],
+                               key=lambda x: x[1], reverse=True)
+
+    @staticmethod
+    def _get_agent(ent_name, ent_type, id, database):
+        gnd_type = _type_db_map[(ent_type, database)]
+        if gnd_type == 'UP':
+            up_id = id
+            db_refs = {'UP': up_id}
+            name = uniprot_client.get_gene_name(up_id)
+            hgnc_id = hgnc_client.get_hgnc_id(name)
+            if hgnc_id:
+                db_refs['HGNC'] = hgnc_id
+        # Other possible groundings are PUBCHEM and SIGNOR
+        elif gnd_type is not None:
+            assert database in ('PUBCHEM', 'SIGNOR')
+            db_refs = {database: id}
+            name = ent_name
+        # If no grounding, include as an untyped/ungrounded node
+        else:
+            name = ent_name
+            db_refs = {}
+        return Agent(name, db_refs=db_refs)
+
+    @staticmethod
+    def _get_evidence(row):
+        # Get epistemics (direct/indirect)
+        epistemics = {}
+        epistemics['direct'] = True if row.DIRECT == 'YES' else False
+        # Get annotations
+        _n = lambda s: s if s else None
+        # TODO: Refactor to exclude keys that are just Nones
+        annotations = {
+                'SEQUENCE': _n(row.SEQUENCE),
+                'TAX_ID': _n(row.TAX_ID),
+                'CELL_DATA': _n(row.CELL_DATA),
+                'TISSUE_DATA': _n(row.TISSUE_DATA),
+                'MODULATOR_COMPLEX': _n(row.MODULATOR_COMPLEX),
+                'TARGET_COMPLEX': _n(row.TARGET_COMPLEX),
+                'MODIFICATIONA': _n(row.MODIFICATIONA),
+                'MODASEQ': _n(row.MODASEQ),
+                'MODIFICATIONB': _n(row.MODIFICATIONB),
+                'MODBSEQ': _n(row.MODBSEQ),
+                'NOTES': _n(row.NOTES),
+                'ANNOTATOR': _n(row.ANNOTATOR)}
+        return Evidence(source_api='SIGNOR', source_id=row.SIGNOR_ID,
+                        pmid=row.PMID, text=row.SENTENCE,
+                        epistemics=epistemics, annotations=annotations)
+
+    @staticmethod
+    def _process_row(row):
+        agent_a = SignorProcessor._get_agent(row.ENTITYA, row.TYPEA, row.IDA,
+                                             row.DATABASEA)
+        agent_b = SignorProcessor._get_agent(row.ENTITYB, row.TYPEB, row.IDB,
+                                             row.DATABASEB)
+        evidence = SignorProcessor._get_evidence(row)
+        stmts = []
+        # First, check for EFFECT/MECHANISM pairs giving rise to a single
+        # mechanism
+        if row.MECHANISM == 'transcriptional regulation' and \
+           row.EFFECT in ('up-regulates', 'up-regulates quantity',
+                          'up-regulates quantity by expression',
+                          'down-regulates', 'down-regulates quantity',
+                          'down-regulates quantity by repression'):
+            stmt_type = IncreaseAmount if row.EFFECT.startswith('up') \
+                                       else DecreaseAmount
+            # Since this is a transcriptional regulation, apply a
+            # transcriptional activity condition to the subject
+            ac = ActivityCondition('transcription', True)
+            agent_a.activity = ac
+            # Create the statement
+            stmts.append(stmt_type(agent_a, agent_b, evidence=evidence))
+        elif row.MECHANISM == 'stabilization' and \
+             row.EFFECT in ('up-regulates', 'up-regulates quantity',
+                            'up-regulates quantity by stabilization'):
+            stmts.append(IncreaseAmount(agent_a, agent_b, evidence=evidence))
+        elif row.MECHANISM == 'destabilization' and \
+             row.EFFECT in ('down-regulates', 'down-regulates quantity',
+                            'down-regulates quantity by destabilization'):
+            stmts.append(DecreaseAmount(agent_a, agent_b, evidence=evidence))
+        elif row.MECHANISM == 'chemical activation' and \
+             row.EFFECT in ('up-regulates', 'up-regulates activity'):
+            stmts.append(Activation(agent_a, agent_b, evidence=evidence))
+        elif row.MECHANISM == 'chemical inhibition' and \
+             row.EFFECT in ('down-regulates', 'down-regulates activity'):
+            stmts.append(Inhibition(agent_a, agent_b, evidence=evidence))
+        elif row.MECHANISM == 'binding' and row.EFFECT == 'form complex':
+            stmts.append(Complex([agent_a, agent_b], evidence=evidence))
+        # The above mechanism/effect combinations should be the only types
+        # giving rise to statements of the same type with same args.
+        # They also can't give rise to any active form statements; therefore
+        # we have gotten all the statements we will get and can return.
+        if stmts:
+            return stmts
+
+        # If we have a different effect/mechanism combination, we can now get
+        # them separately.
+        # Get the effect statement type:
+        effect_stmt_type = _effect_map[row.EFFECT]
+        # Get the mechanism statement type.
+        # If the mechanism is transcriptional regulation, we need to check
+        # the effect to know whether it is an increase or decrease
+        if row.MECHANISM:
+            mech_stmt_type = _mechanism_map[row.MECHANISM]
+        else:
+            mech_stmt_type = None
+        # Either or both effect/mech stmt types may be None at this point.
+        # First, create the effect statement:
+        if effect_stmt_type == Complex:
+            stmts.append(effect_stmt_type([agent_a, agent_b],
+                                          evidence=evidence))
+        elif effect_stmt_type:
+            stmts.append(effect_stmt_type(agent_a, agent_b, evidence=evidence))
+
+        # Now check if we were able to successfully get a mechanism type;
+        # if not, don't make a mechanism statement
+        if mech_stmt_type and issubclass(mech_stmt_type, Modification):
+            if not row.RESIDUE:
+                stmts.append(mech_stmt_type(agent_a, agent_b, None, None,
+                                             evidence=evidence))
+            else:
+                # Because this is a modification, check for a residue
+                residues = _parse_residue_positions(row.RESIDUE)
+                stmts.extend([mech_stmt_type(agent_a, agent_b, res[0], res[1],
+                                        evidence=evidence) for res in residues])
+            # TODO: Add ActiveForm statements here
+        # Don't make a new complex statement if 
+        elif mech_stmt_type == Complex:
+            stmts.append(mech_stmt_type([agent_a, agent_b], evidence=evidence))
+            # TODO Add ActiveForm statements here
+        elif mech_stmt_type:
+            stmts.append(mech_stmt_type(agent_a, agent_b, evidence=evidence))
+
+        return stmts
+
+
+def _parse_residue_positions(residue_field):
+    # First see if this string contains two positions
+    res_strs = [rs.strip() for rs in residue_field.split(';')]
+    def _parse_respos(respos):
+        # Split off the amino acid
+        res = respos[0:3]
+        pos = respos[3:]
+        # Get the abbreviated amino acid
+        res = amino_acids_reverse.get(res.lower())
+        if not res:
+            logger.warning("Could not get amino acid residue for "
+                           "residue/position %s" % respos)
+            return (None, None)
+        # If there's no position, return residue only
+        if not pos:
+            return (res, None)
+        # Make sure the position is an integer
+        try:
+            int(pos)
+        except ValueError:
+            logger.warning("Could not get valid position for residue/position "
+                           "%s" % respos)
+            return (None, None)
+        return (res, pos)
+    return [_parse_respos(rp) for rp in res_strs]
+
+"""
+Known issues:
+* The generic "up-regulates" effect type should be mapped to a generic up
+  regulation rather than Activation/Inhibition, as it is currently.
+* Mappings for SIGNOR families, complexes, etc.
+"""

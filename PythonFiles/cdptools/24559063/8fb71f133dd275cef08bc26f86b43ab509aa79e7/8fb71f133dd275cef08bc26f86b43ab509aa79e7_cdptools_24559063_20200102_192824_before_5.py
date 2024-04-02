@@ -1,0 +1,149 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+import json
+from pathlib import Path
+
+import pytest
+
+from cdptools.indexers import Indexer
+
+
+@pytest.fixture
+def example_transcript_raw(data_dir) -> Path:
+    return data_dir / "example_transcript_raw.json"
+
+
+@pytest.fixture
+def example_transcript_words(data_dir) -> Path:
+    return data_dir / "example_transcript_words.json"
+
+
+@pytest.fixture
+def example_transcript_sentences(data_dir) -> Path:
+    return data_dir / "example_transcript_sentences.json"
+
+
+@pytest.fixture
+def example_audio(data_dir) -> Path:
+    return data_dir / "example_audio.wav"
+
+
+@pytest.fixture
+def example_event_pipeline_config(data_dir) -> Path:
+    return data_dir / "example_event_pipeline_config.json"
+
+
+@pytest.fixture
+def indexed_results():
+    return {
+        "hello": {
+            "event_0": 0.0,
+            "event_1": 0.0
+        },
+        "world": {
+            "event_0": 0.0,
+            "event_1": 0.0
+        },
+        "name": {
+            "event_0": 0.6931471805599453
+        },
+        "jackson": {
+            "event_0": 0.6931471805599453
+        },
+        "internet": {
+            "event_1": 0.6931471805599453
+        },
+        "gener": {
+            "event_1": 0.6931471805599453
+        },
+        "go": {
+            "event_1": 0.6931471805599453
+        },
+        "maxfield": {
+            "event_1": 0.6931471805599453
+        }
+    }
+
+
+DROPPED_ZEROS_INDEX = {
+    "name": {
+        "event_0": 0.6931471805599453
+    },
+    "jackson": {
+        "event_0": 0.6931471805599453
+    },
+    "internet": {
+        "event_1": 0.6931471805599453
+    },
+    "gener": {
+        "event_1": 0.6931471805599453
+    },
+    "go": {
+        "event_1": 0.6931471805599453
+    },
+    "maxfield": {
+        "event_1": 0.6931471805599453
+    }
+}
+
+
+def test_get_raw_transcript_formats(
+    example_transcript_raw,
+    example_transcript_words,
+    example_transcript_sentences,
+    example_audio,
+    example_event_pipeline_config,
+):
+    # Get raw for format testing
+    with open(example_transcript_raw, "r") as read_in:
+        raw_transcript = json.load(read_in)
+        raw_transcript = raw_transcript["data"][0]["text"]
+
+    result = Indexer.get_raw_transcript(example_transcript_raw)
+    assert isinstance(result, str)
+    assert result == raw_transcript
+
+    result = Indexer.get_raw_transcript(example_transcript_words)
+    assert isinstance(result, str)
+    assert result == raw_transcript
+
+    result = Indexer.get_raw_transcript(example_transcript_sentences)
+    assert isinstance(result, str)
+    assert result == raw_transcript
+
+    # Check formats that should fail
+    with pytest.raises(TypeError):
+        Indexer.get_raw_transcript(example_audio)
+
+    with pytest.raises(TypeError):
+        Indexer.get_raw_transcript(example_event_pipeline_config)
+
+
+@pytest.mark.parametrize("text, expected", [
+    ("hello world", "hello world"),
+    ("hello ", "hello"),
+    ("the quick brown fox jumps over the running ant", "quick brown fox jump run ant"),
+    ("The quick brown fox jumps over the running ant", "quick brown fox jump run ant"),
+    ("thE quICk BROwn Fox JuMps OVER the RUNning ANt", "quick brown fox jump run ant"),
+    ("1 billion", "1 billion"),
+    ("98%", "98"),
+    ("\n\n\n\nMEMORANDUM\n\nHello\n\tSPR", "memorandum hello spr"),
+    # Would love to learn better methods for handling cases like this but I don't think it matters too much
+    ("1.4 Million", "14 million"),
+    ("Will this remove punctuation?!%'", "remov punctuat"),
+    ("$10 10.5% $5.5 2%", "10 105 55 2"),
+    ("The study will reportedly cost $14.8 thousand", "studi reportedli cost 148 thousand")
+])
+def test_clean_text_for_indexing(text, expected):
+    result = Indexer.clean_text_for_indexing(text)
+    assert result == expected
+
+
+@pytest.mark.parametrize("min_value, expected", [
+    (0.0, DROPPED_ZEROS_INDEX),
+    (1.0, {})
+])
+def test_drop_terms_from_index_below_value(indexed_results, min_value, expected):
+    result = Indexer.drop_terms_from_index_below_value(indexed_results, min_value)
+    assert result == expected

@@ -1,0 +1,100 @@
+from __future__ import absolute_import, print_function, unicode_literals
+from builtins import dict, str
+from os.path import join, dirname
+from nose.tools import raises
+
+from indra.statements import *
+from indra.sources.geneways.geneways_symbols_parser import \
+        GenewaysSymbols
+#from indra.sources.geneways.geneways_action_parser import \
+#        GenewaysActionParser
+from indra.sources.geneways.geneways_actionmention_parser import \
+        GenewaysActionMentionParser
+#from indra.sources.geneways.geneways_api import process_geneways_files
+#from indra.sources.geneways.processor import GenewaysProcessor
+
+# Path to the Geneways test/dummy data folder
+path_this = os.path.dirname(os.path.abspath(__file__))
+data_folder = os.path.join(path_this,
+        '../../data/tests_data/geneways_tests_data')
+symbols_file = os.path.join(data_folder, 'human_symbols.txt')
+actionmention_file = os.path.join(data_folder,
+        'human_actionmention.txt')
+action_file = os.path.join(data_folder,
+        'human_action.txt')
+
+def test_geneways_symbols_parser():
+    symbols = GenewaysSymbols(symbols_file)
+
+    print(symbols.symbol_to_id('Akt') == ['1'])
+    assert(symbols.symbol_to_id('Akt') == ['1'])
+    assert(symbols.symbol_to_id('c-Src') == ['2'])
+
+    assert(symbols.id_to_symbol('1') == 'Akt')
+    assert(symbols.id_to_symbol('2') == 'c-Src')
+
+    assert(len(symbols.symbols_with_multiple_ids()) == 0)
+
+def test_geneways_actionmention_parser():
+    parser = GenewaysActionMentionParser(actionmention_file)
+
+    assert(len(parser.action_mentions) == 4)
+    mention0 = parser.action_mentions[0]
+    mention1 = parser.action_mentions[1]
+    mention2 = parser.action_mentions[2]
+    mention3 = parser.action_mentions[3]
+
+    #Make sure that the parser reads in the TSV file into the correct fields
+
+    #First action mention
+    assert(mention0.hiid == '1')
+    assert(mention0.actionmentionid == '1')
+    assert(mention0.negative == '0')
+    assert(mention0.upstream == 'c-Src')
+    assert(mention0.actiontype == 'phosphorylate')
+    assert(mention0.downstream == 'Akt')
+    assert(mention0.pmid == '19262695')
+    assert(mention0.isFullText == '1')
+    assert(mention0.sentencenumber == '4')
+    assert(mention0.score == '0.56')
+    assert(mention0.prec == '0.78')
+
+    #Second action mention
+    assert(mention1.hiid == '1')
+    assert(mention1.actionmentionid == '2')
+    assert(mention1.negative == '0')
+    assert(mention1.upstream == 'c-Src')
+    assert(mention1.actiontype == 'phosphorylate')
+    assert(mention1.downstream == 'Akt')
+    assert(mention1.pmid == '2')
+    assert(mention1.isFullText == '0')
+    assert(mention1.sentencenumber == '7')
+    assert(mention1.score == '0.23')
+    assert(mention1.prec == '0.34')
+
+    #Third action mention
+    assert(mention2.hiid == '2')
+    assert(mention2.actionmentionid == '3')
+    assert(mention2.negative == '1')
+    assert(mention2.upstream == 'A')
+    assert(mention2.actiontype == 'bind')
+    assert(mention2.downstream == 'B')
+    assert(mention2.pmid == '0')
+    assert(mention2.isFullText == '0')
+    assert(mention2.sentencenumber == '0')
+    assert(mention2.score == '0.12')
+    assert(mention2.prec == '0.48')
+
+    #Fourth action mention
+    assert(mention3.hiid == '3')
+    assert(mention3.actionmentionid == '4')
+    assert(mention3.negative == '0')
+    assert(mention3.upstream == 'C')
+    assert(mention3.actiontype == 'bind')
+    assert(mention3.downstream == 'D')
+    assert(mention3.pmid == '0')
+    assert(mention3.isFullText == '0')
+    assert(mention3.sentencenumber == '0')
+    assert(mention3.score == '0.22')
+    assert(mention3.prec == '0.55')
+

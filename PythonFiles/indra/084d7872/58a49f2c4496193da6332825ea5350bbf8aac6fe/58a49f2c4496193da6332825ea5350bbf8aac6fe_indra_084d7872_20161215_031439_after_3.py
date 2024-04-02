@@ -1,0 +1,61 @@
+# exported from PySB model 'None'
+
+from pysb import Model, Monomer, Parameter, Expression, Compartment, Rule, Observable, Initial, MatchOnce, Annotation, ANY, WILD
+
+Model()
+
+Monomer(u'PPM1D', [u'act'], {u'act': [u'inactive', u'active']})
+Monomer(u'TP53', [u'act'], {u'act': [u'inactive', u'active']})
+Monomer(u'PROTEASE', [u'act'], {u'act': [u'inactive', u'active']})
+Monomer(u'ATR', [u'act'], {u'act': [u'inactive', u'active']})
+Monomer(u'ARF', [u'act'], {u'act': [u'inactive', u'active']})
+Monomer(u'MDM2', [u'act'], {u'act': [u'inactive', u'active']})
+
+Parameter(u'kf_aa_act_1', 5e-06)
+Parameter(u'kf_at_act_1', 1e-06)
+Parameter(u'kf_tp_act_1', 1e-06)
+Parameter(u'kf_tm_act_1', 1e-06)
+Parameter(u'kf_pt_act_1', 1e-05)
+Parameter(u'kf_mt_act_1', 1e-06)
+Parameter(u'kf_pp_act_1', 1e-06)
+Parameter(u'kf_am_act_1', 1e-06)
+Parameter(u'PPM1D_0', 100.0)
+Parameter(u'TP53_0', 100.0)
+Parameter(u'PROTEASE_0', 0)
+Parameter(u'ATR_0', 100.0)
+Parameter(u'ARF_0', 0)
+Parameter(u'MDM2_0', 100.0)
+Parameter('ARF_act_0', 100.0)
+Parameter('PROTEASE_act_0', 100.0)
+Parameter('ATRa_0', 1.0)
+
+Observable('P53_active', TP53(act='active'))
+
+Rule(u'ATR_activity_activates_ATR_activity', ATR(act=u'active') + ATR(act=u'inactive') >> ATR(act=u'active') + ATR(act=u'active'), kf_aa_act_1)
+Rule(u'ATR_activity_activates_TP53_activity', ATR(act=u'active') + TP53(act=u'inactive') >> ATR(act=u'active') + TP53(act=u'active'), kf_at_act_1)
+Rule(u'TP53_activity_activates_PPM1D_activity', TP53(act=u'active') + PPM1D(act=u'inactive') >> TP53(act=u'active') + PPM1D(act=u'active'), kf_tp_act_1)
+Rule(u'TP53_activity_activates_MDM2_activity', TP53(act=u'active') + MDM2(act=u'inactive') >> TP53(act=u'active') + MDM2(act=u'active'), kf_tm_act_1)
+Rule(u'PPM1D_activity_activates_TP53_activity', PPM1D(act=u'active') + TP53(act=u'active') >> PPM1D(act=u'active') + TP53(act=u'inactive'), kf_pt_act_1)
+Rule(u'MDM2_activity_activates_TP53_activity', MDM2(act=u'active') + TP53(act=u'active') >> MDM2(act=u'active') + TP53(act=u'inactive'), kf_mt_act_1)
+Rule(u'PROTEASE_activity_activates_PPM1D_activity', PROTEASE(act=u'active') + PPM1D(act=u'active') >> PROTEASE(act=u'active') + PPM1D(act=u'inactive'), kf_pp_act_1)
+Rule(u'ARF_activity_activates_MDM2_activity', ARF(act=u'active') + MDM2(act=u'active') >> ARF(act=u'active') + MDM2(act=u'inactive'), kf_am_act_1)
+
+Initial(PPM1D(act=u'inactive'), PPM1D_0)
+Initial(TP53(act=u'inactive'), TP53_0)
+Initial(PROTEASE(act=u'inactive'), PROTEASE_0)
+Initial(ATR(act=u'inactive'), ATR_0)
+Initial(ARF(act=u'inactive'), ARF_0)
+Initial(MDM2(act=u'inactive'), MDM2_0)
+Initial(PROTEASE(act='active'), PROTEASE_act_0)
+Initial(ARF(act='active'), ARF_act_0)
+Initial(ATR(act='active'), ATRa_0)
+
+Annotation(PPM1D, u'http://identifiers.org/hgnc/HGNC:9277', u'is')
+Annotation(PPM1D, u'http://identifiers.org/uniprot/O15297', u'is')
+Annotation(TP53, u'http://identifiers.org/hgnc/HGNC:11998', u'is')
+Annotation(TP53, u'http://identifiers.org/uniprot/P04637', u'is')
+Annotation(ATR, u'http://identifiers.org/uniprot/Q13535', u'is')
+Annotation(ATR, u'http://identifiers.org/hgnc/HGNC:882', u'is')
+Annotation(MDM2, u'http://identifiers.org/uniprot/Q00987', u'is')
+Annotation(MDM2, u'http://identifiers.org/hgnc/HGNC:6973', u'is')
+
